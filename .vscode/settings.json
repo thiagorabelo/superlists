@@ -1,6 +1,6 @@
 {
-    "python.pythonPath": "~/.virtualenvs/superlists/bin/python",
+    "python.pythonPath": "/home/thiago/.virtualenvs/superlists/bin/python",
     "python.linting.pylintArgs": ["--load-plugins pylint_django"],
-    "python.linting.pylintPath": "~/.virtualenvs/superlists/bin/pylint",
+    "python.linting.pylintPath": "/home/thiago/.virtualenvs/superlists/bin/pylint",
     "findFiles.fileExcludeGlob": "**/__pycache__/**"
 }
