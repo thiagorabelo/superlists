@@ -1,6 +1,34 @@
 {
-    "python.pythonPath": "/home/thiago/.virtualenvs/superlists/bin/python",
-    "python.linting.pylintArgs": ["--load-plugins pylint_django"],
-    "python.linting.pylintPath": "/home/thiago/.virtualenvs/superlists/bin/pylint",
-    "findFiles.fileExcludeGlob": "**/__pycache__/**"
+    "python.pythonPath": "${env:HOME}/.virtualenvs/superlists/bin/python",
+    "python.linting.pylintPath": "${env:HOME}/.virtualenvs/superlists/bin/pylint",
+    "python.autoComplete.extraPaths": [
+        "${env:HOME}/.virtualenvs/superlists/lib/python3.6/site-packages"
+    ],
+    "python.linting.pylintArgs": [
+        "--rcfile=${env:HOME}/PycharmProjects/superlists/.vscode/pylintrc"
+    ],
+    "findFiles.fileExcludeGlob": "**/__pycache__/**",
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true
+    },
+    "window.zoomLevel": -0.1,
+
+    "files.trimTrailingWhitespace": true,
+
+    "files.associations": {
+        "**/templates/*.html": "django-html",
+        "**/templates/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/__pycache__/**": true,
+    },
+    "emmet.includeLanguages": {"django-html": "html"}
 }
