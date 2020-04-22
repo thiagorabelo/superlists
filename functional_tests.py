@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # pylint: disable=C0111
 
 import time
@@ -38,7 +39,8 @@ class NewVisitor(unittest.TestCase):
         table = self.brower.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(row.text == f'1: {input_text}' for row in rows)
+            any(row.text == f'1: {input_text}' for row in rows),
+            'New To-Do did not appear in table'
         )
 
         self.fail('Finish the test!')
