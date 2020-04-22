@@ -11,7 +11,9 @@
             "console": "integratedTerminal",
             "program": "${workspaceFolder}/manage.py",
             "args": [
-                "shell"
+                "shell",
+                "-i",
+                "bpython"
             ],
             "django": true,
             "stopOnEntry": false,
