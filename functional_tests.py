@@ -29,19 +29,23 @@ class NewVisitor(unittest.TestCase):
             'Enter a to-do item'
         )
 
-        input_text = 'Compre penas de pavão'
-
-        inputbox.send_keys(input_text)
+        input_text_1 = 'Compre penas de pavão'
+        inputbox.send_keys(input_text_1)
         inputbox.send_keys(Keys.ENTER)
-
         time.sleep(1)
 
+        input_text_2 = 'Usar penas de pavão para fazer um fly'
+        inputbox = self.brower.find_element_by_id('id_new_item')
+        inputbox.send_keys(input_text_2)
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        # input('pause...')
         table = self.brower.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == f'1: {input_text}' for row in rows),
-            'New To-Do did not appear in table'
-        )
+
+        self.assertIn(f'1: {input_text_1}', [row.text for row in rows])
+        self.assertIn(f'2: {input_text_2}', [row.text for row in rows])
 
         self.fail('Finish the test!')
 
