@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=C0111
 
 import time
 import unittest
@@ -53,6 +52,7 @@ class NewVisitor(unittest.TestCase):
         self.check_for_row_in_list_table(f'2: {input_text_2}')
 
         self.fail('Finish the test!')
+
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
