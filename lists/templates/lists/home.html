@@ -10,9 +10,11 @@
         </form>
         <table id="id_list_table">
             <tbody>
-                <tr>
-                    <td>1: {{ new_item_text }}</td>
-                </tr>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}: {{ item.text }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </body>
