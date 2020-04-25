@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import time
+import functools
 
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
+
+from . import base
 
 
 class NewVisitor(LiveServerTestCase):
@@ -18,24 +19,24 @@ class NewVisitor(LiveServerTestCase):
     def tearDown(self):
         self.brower.quit()
 
+    @staticmethod
+    def wait_for(func, *args, max_wait=10, step_wait=0.5, **kwargs):
+        @base.wait(max_wait=max_wait, step_wait=step_wait)
+        @functools.wraps(func)
+        def proxy_dummy(*args_, **kwargs_):
+            return func(*args_, **kwargs_)
+
+        return proxy_dummy(*args, **kwargs)
+
     def submit_data_by_post(self, text):
         inputbox = self.brower.find_element_by_id('id_new_item')
         inputbox.send_keys(text)
         inputbox.send_keys(Keys.ENTER)
 
-    def wait_for_row_in_list_table(self, row_text):
-        start_time = time.time()
-
-        while True:
-            try:
-                table = self.brower.find_element_by_id('id_list_table')
-                rows = table.find_elements_by_tag_name('tr')
-                self.assertIn(row_text, [row.text for row in rows])
-                return
-            except (AssertionError, WebDriverException) as ex:
-                if time.time() - start_time > self.MAX_WAIT:
-                    raise ex
-                time.sleep(0.5)
+    def check_for_row_in_list_table(self, row_text):
+        table = self.brower.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
 
     def test_can_start_a_list_and_retrieve_it_later(self):  # pylint: disable=C0103
         self.brower.get(self.live_server_url)
@@ -50,11 +51,11 @@ class NewVisitor(LiveServerTestCase):
 
         input_text_1 = 'Compre penas de pavão'
         self.submit_data_by_post(input_text_1)
-        self.wait_for_row_in_list_table(f'1: {input_text_1}')
+        self.wait_for(self.check_for_row_in_list_table, f'1: {input_text_1}', max_wait=2)
 
         input_text_2 = 'Usar penas de pavão para fazer um fly'
         self.submit_data_by_post(input_text_2)
-        self.wait_for_row_in_list_table(f'1: {input_text_1}')
-        self.wait_for_row_in_list_table(f'2: {input_text_2}')
+        self.wait_for(self.check_for_row_in_list_table, f'1: {input_text_1}', max_wait=2)
+        self.wait_for(self.check_for_row_in_list_table, f'2: {input_text_2}', max_wait=2)
 
         self.fail('Finish the test!')
