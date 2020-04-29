@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import functools
-
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -9,43 +7,35 @@ from selenium.webdriver.common.keys import Keys
 from . import base
 
 
-class NewVisitor(LiveServerTestCase):
+class NewVisitor(LiveServerTestCase, base.ExplicitWaitMixin):
 
     MAX_WAIT = 10
 
     def setUp(self):
-        self.brower = webdriver.Firefox()
+        self.browser = webdriver.Firefox()
 
     def tearDown(self):
-        self.brower.quit()
-
-    @staticmethod
-    def wait_for(func, *args, max_wait=10, step_wait=0.5, **kwargs):
-        @base.wait(max_wait=max_wait, step_wait=step_wait)
-        @functools.wraps(func)
-        def proxy_dummy(*args_, **kwargs_):
-            return func(*args_, **kwargs_)
-
-        return proxy_dummy(*args, **kwargs)
+        self.browser.quit()
 
     def submit_data_by_post(self, text):
-        inputbox = self.brower.find_element_by_id('id_new_item')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.clear()
         inputbox.send_keys(text)
         inputbox.send_keys(Keys.ENTER)
 
     def check_for_row_in_list_table(self, row_text):
-        table = self.brower.find_element_by_id('id_list_table')
+        table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
 
-    def test_can_start_a_list_and_retrieve_it_later(self):  # pylint: disable=C0103
-        self.brower.get(self.live_server_url)
+    def test_can_start_a_list_for_one_user(self):  # pylint: disable=C0103
+        self.browser.get(self.live_server_url)
 
-        self.assertIn('To-Do', self.brower.title)
-        header_text = self.brower.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', self.browser.title)
+        header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do', header_text)
 
-        inputbox = self.brower.find_element_by_id('id_new_item')
+        inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertEqual(inputbox.get_attribute('placeholder'),
                          'Enter a to-do item')
 
@@ -58,4 +48,40 @@ class NewVisitor(LiveServerTestCase):
         self.wait_for(self.check_for_row_in_list_table, f'1: {input_text_1}', max_wait=2)
         self.wait_for(self.check_for_row_in_list_table, f'2: {input_text_2}', max_wait=2)
 
-        self.fail('Finish the test!')
+        # self.fail('Finish the test!')
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        self.browser.get(self.live_server_url)
+
+        # user1
+        user1_text_1 = 'Compre penas de pavão'
+        user1_text_2 = 'Use penas de pavão para fazer um fly'
+        self.wait_for(self.submit_data_by_post, user1_text_1, max_wait=2)
+        self.wait_for(self.submit_data_by_post, user1_text_2, max_wait=2)
+        self.wait_for(self.check_for_row_in_list_table, f'2: {user1_text_2}', max_wait=2)
+        self.wait_for(self.check_for_row_in_list_table, f'1: {user1_text_1}', max_wait=2)
+
+        user1_list_url = self.browser.current_url
+        self.assertRegex(user1_list_url, '/lists/.+')
+
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # user2
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(user1_text_1, page_text)
+        self.assertNotIn(user1_text_2, page_text)
+
+        user2_text_1 = 'Compre leite'
+        self.submit_data_by_post(user2_text_1)
+        self.wait_for(self.check_for_row_in_list_table, f'1: {user2_text_1}', max_wait=2)
+
+        user2_list_url = self.browser.current_url
+        self.assertRegex(user2_list_url, '/lists/.+')
+        self.assertNotEqual(user2_list_url, user1_list_url)
+
+        # user1
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn(user1_text_1, page_text)
+        self.assertIn(user2_text_1, page_text)
