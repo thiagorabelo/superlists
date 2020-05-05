@@ -9,8 +9,6 @@ from . import base
 
 class NewVisitor(LiveServerTestCase, base.ExplicitWaitMixin):
 
-    MAX_WAIT = 10
-
     def setUp(self):
         self.browser = webdriver.Firefox()
 

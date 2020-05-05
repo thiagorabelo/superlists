@@ -33,6 +33,27 @@
             "django": true,
             "stopOnEntry": false,
             "justMyCode": false
+        },
+        {
+            "name": "Python: Test (Django)",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "test",
+                "${input:manage_args}"
+            ],
+            "django": true,
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+    ],
+    "inputs": [
+        {
+            "id": "manage_args",
+            "type": "promptString",
+            "description": "Argumentos para passar para o manage.py"
         }
     ]
 }
