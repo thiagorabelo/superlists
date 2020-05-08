@@ -15,8 +15,8 @@ class NewVisitor(LiveServerTestCase, base.ExplicitWaitMixin):
     def tearDown(self):
         self.browser.quit()
 
-    def submit_data_by_post(self, text):
-        inputbox = self.browser.find_element_by_id('id_new_item')
+    def submit_data_by_post(self, text, id_input='id_new_item'):
+        inputbox = self.browser.find_element_by_id(id_input)
         inputbox.clear()
         inputbox.send_keys(text)
         inputbox.send_keys(Keys.ENTER)
@@ -83,3 +83,24 @@ class NewVisitor(LiveServerTestCase, base.ExplicitWaitMixin):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(user1_text_1, page_text)
         self.assertIn(user2_text_1, page_text)
+
+    def test_layout_and_styling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
+
+        text_1 = 'testando'
+        self.submit_data_by_post(text_1)
+        self.wait_for(self.check_for_row_in_list_table, f'1: {text_1}', max_wait=2)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
