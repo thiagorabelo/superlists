@@ -5,7 +5,7 @@
 {% block form_action %}{% url 'lists:add_item' list.pk %}{% endblock %}
 
 {% block table %}
-    <table id="id_list_table">
+    <table id="id_list_table" class="table">
         <tbody>
             {% for item in list.item_set.all %}
                 <tr>
