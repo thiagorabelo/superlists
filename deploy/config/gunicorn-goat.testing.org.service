@@ -6,7 +6,7 @@ Restart=on-failure
 User=thiago
 WorkingDirectory=/home/thiago/sites/goat.testing.org/source
 ExecStart=/home/thiago/sites/goat.testing.org/virtualenv/bin/gunicorn \
-    --bind /tmp/goat.testing.org.socket \
+    --bind unix:/tmp/goat.testing.org.socket \
     superlists.wsgi:application
 
 [Install]
