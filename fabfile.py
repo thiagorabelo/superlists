@@ -6,7 +6,7 @@ from fabric.contrib.files import append, exists, sed
 from fabric.api import env, local, run, cd
 
 
-REPO_URL = '/home/thiago/repo/superlists'
+REPO_URL = 'https://github.com/thiagorabelo/superlists.git'
 
 
 def _create_directory_structure_if_necessary(site_folder):
