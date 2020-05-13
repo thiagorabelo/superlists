@@ -15,6 +15,11 @@
         "**/CVS": true,
         "**/.DS_Store": true
     },
+
+    "git.ignoredRepositories": [
+        "/home/thiago/.pyenv"
+    ],
+
     "window.zoomLevel": -0.1,
 
     "files.trimTrailingWhitespace": true,

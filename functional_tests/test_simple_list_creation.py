@@ -1,36 +1,11 @@
-#!/usr/bin/env python
+# pylint: disable=too-many-ancestors
 
-import os
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 from . import base
 
 
-class NewVisitor(StaticLiveServerTestCase, base.ExplicitWaitMixin):
-
-    def setUp(self):
-        self.browser = webdriver.Firefox()
-
-        staging_server = os.environ.get('STAGING_SERVER')
-        if staging_server:
-            self.live_server_url = f'http://{staging_server}'
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def submit_data_by_post(self, text, id_input='id_new_item'):
-        inputbox = self.browser.find_element_by_id(id_input)
-        inputbox.clear()
-        inputbox.send_keys(text)
-        inputbox.send_keys(Keys.ENTER)
-
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
+class NewVisitorTest(base.FunctionalTest):
 
     def test_can_start_a_list_for_one_user(self):  # pylint: disable=C0103
         self.browser.get(self.live_server_url)
@@ -89,29 +64,3 @@ class NewVisitor(StaticLiveServerTestCase, base.ExplicitWaitMixin):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(user1_text_1, page_text)
         self.assertIn(user2_text_1, page_text)
-
-    def test_layout_and_styling(self):
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-
-        inputbox = self.browser.find_element_by_id('id_new_item')
-
-        self.wait_for(
-            self.assertAlmostEqual,
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10,
-            max_wait=3
-        )
-
-        text_1 = 'testando'
-        self.submit_data_by_post(text_1)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {text_1}', max_wait=2)
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.wait_for(
-            self.assertAlmostEqual,
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10,
-            max_wait=3
-        )
