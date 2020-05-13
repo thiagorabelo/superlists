@@ -33,18 +33,7 @@ def wait(func=None, max_wait=10, step_wait=0.5):
     return decorator
 
 
-class ExplicitWaitMixin:  # pylint: disable=too-few-public-methods
-    @staticmethod
-    def wait_for(func, *args, max_wait=10, step_wait=0.5, **kwargs):
-        @wait(max_wait=max_wait, step_wait=step_wait)
-        @functools.wraps(func)
-        def proxy_dummy(*args_, **kwargs_):
-            return func(*args_, **kwargs_)
-
-        return proxy_dummy(*args, **kwargs)
-
-
-class FunctionalTest(ExplicitWaitMixin, StaticLiveServerTestCase):
+class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -66,3 +55,15 @@ class FunctionalTest(ExplicitWaitMixin, StaticLiveServerTestCase):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
+
+    def wait_for(self, func, *args, **kwargs):
+        class Wait:  # pylint: disable=too-few-public-methods
+            @staticmethod
+            def run(max_wait=10, step_wait=0.5):
+                @wait(max_wait=max_wait, step_wait=step_wait)
+                @functools.wraps(func)
+                def proxy_dummy(*args_, **kwargs_):
+                    return func(*args_, **kwargs_)
+
+                return proxy_dummy(*args, **kwargs)
+        return Wait()
