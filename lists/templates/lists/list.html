@@ -2,7 +2,7 @@
 
 {% block header_text %}Your To-Do list{% endblock %}
 
-{% block form_action %}{% url 'lists:add_item' list.pk %}{% endblock %}
+{% block form_action %}{% url 'lists:view_list' list.pk %}{% endblock %}
 
 {% block table %}
     <table id="id_list_table" class="table">

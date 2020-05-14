@@ -47,6 +47,35 @@ class ListViewTest(TestCase):
 
         self.assertEqual(response.context['list'], correct_list)
 
+    def test_can_save_a_POST_request_to_an_existing_list(self):  # pylint: disable=invalid-name
+        other_list = List.objects.create()  # pylint: disable=unused-variable
+        correct_list = List.objects.create()
+
+        new_list_item_1 = 'Um novo item para uma lista existente'
+
+        self.client.post(
+            f'/lists/{correct_list.pk}/',
+            data={'item_text': new_list_item_1}
+        )
+
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, new_list_item_1)
+        self.assertEqual(new_item.list, correct_list)
+
+    def test_POST_redirect_to_list_view(self):  # pylint: disable=invalid-name
+        other_list = List.objects.create()  # pylint: disable=unused-variable
+        correct_list = List.objects.create()
+
+        new_list_item_1 = 'Um novo item para uma lista existente'
+
+        response = self.client.post(
+            f'/lists/{correct_list.pk}/',
+            data={'item_text': new_list_item_1}
+        )
+
+        self.assertRedirects(response, f'/lists/{correct_list.pk}/')
+
 
 class NewListTest(TestCase):
 
@@ -74,35 +103,3 @@ class NewListTest(TestCase):
         self.client.post('/lists/new', data={'item_text': ''})
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
-
-
-class NewItemTest(TestCase):
-
-    def test_can_save_a_POST_request_to_an_existing_list(self):  # pylint: disable=invalid-name
-        other_list = List.objects.create()  # pylint: disable=unused-variable
-        correct_list = List.objects.create()
-
-        new_list_item_1 = 'Um novo item para uma lista existente'
-
-        self.client.post(
-            f'/lists/{correct_list.pk}/add_item',
-            data={'item_text': new_list_item_1}
-        )
-
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, new_list_item_1)
-        self.assertEqual(new_item.list, correct_list)
-
-    def test_redirect_to_list_view(self):
-        other_list = List.objects.create()  # pylint: disable=unused-variable
-        correct_list = List.objects.create()
-
-        new_list_item_1 = 'Um novo item para uma lista existente'
-
-        response = self.client.post(
-            f'/lists/{correct_list.pk}/add_item',
-            data={'item_text': new_list_item_1}
-        )
-
-        self.assertRedirects(response, f'/lists/{correct_list.pk}/')
