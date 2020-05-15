@@ -1,3 +1,5 @@
+# pylint: disable=too-few-public-methods
+
 import functools
 import inspect
 import os
@@ -56,14 +58,14 @@ class FunctionalTest(StaticLiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
 
-    def wait_for(self, func, *args, **kwargs):
-        class Wait:  # pylint: disable=too-few-public-methods
+    def until(self, max_wait=10, step_wait=0.5):
+        class Wait:
             @staticmethod
-            def run(max_wait=10, step_wait=0.5):
+            def wait(func, *args, **kwargs):
                 @wait(max_wait=max_wait, step_wait=step_wait)
                 @functools.wraps(func)
-                def proxy_dummy(*args_, **kwargs_):
+                def dummy(*args_, **kwargs_):
                     return func(*args_, **kwargs_)
+                return dummy(*args, **kwargs)
 
-                return proxy_dummy(*args, **kwargs)
         return Wait()

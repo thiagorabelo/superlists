@@ -39,6 +39,9 @@
             "type": "python",
             "request": "launch",
             "console": "integratedTerminal",
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            },
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "test",

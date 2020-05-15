@@ -15,31 +15,33 @@ class ItemValidationTest(base.FunctionalTest):
 
         # A página inicial é atualizada e há uma mensagem de erro
         # informando que itens da lista não podem ser vazios.
-        self.wait_for(
-            self.assertEqual,
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "You can't have an empty list item"
-        ).run(max_wait=2)
+        self.until(max_wait=3, step_wait=1).wait(
+            lambda: self.assertEqual(
+                self.browser.find_element_by_css_selector('.has-error').text,
+                "You can't have an empty list item"
+            )
+        )
 
         # Ele tenta novamente com um texto para o item e desta vez
         # funciona
-        text_1 = 'Buy milk'
-        self.submit_data_by_post('Buy milk')
-        self.wait_for(self.check_for_row_in_list_table, f'1: {text_1}')
+        text_1 = 'Compre leite'
+        self.until(max_wait=3, step_wait=1).wait(self.submit_data_by_post, text_1)
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
 
         # De sacanagem, ela tenta submeter um segundo item em branco
         # na lista
         self.browser.find_element_by_id('id_new_item').send_keys(base.Keys.ENTER)
 
         # Ele recebe um aviso semelhante na página da lista.
-        self.wait_for(
-            self.assertEqual,
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "You can't have an empty list item"
-        ).run(max_wait=2)
+        self.until(max_wait=3, step_wait=1).wait(
+            lambda: self.assertEqual(
+                self.browser.find_element_by_css_selector('.has-error').text,
+                "You can't have an empty list item"
+            )
+        )
 
         # Isso pode ser corrigido preenchendo o item com um texto
-        text_2 = 'Make tea'
-        self.submit_data_by_post(text_2)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {text_1}')
-        self.wait_for(self.check_for_row_in_list_table, f'2: {text_2}')
+        text_2 = 'Faça chá'
+        self.until(max_wait=3, step_wait=1).wait(self.submit_data_by_post, text_2)
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'2: {text_2}')

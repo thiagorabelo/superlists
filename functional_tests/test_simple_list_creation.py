@@ -20,12 +20,12 @@ class NewVisitorTest(base.FunctionalTest):
 
         input_text_1 = 'Compre penas de pavão'
         self.submit_data_by_post(input_text_1)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {input_text_1}').run(max_wait=2)
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
 
         input_text_2 = 'Usar penas de pavão para fazer um fly'
         self.submit_data_by_post(input_text_2)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {input_text_1}').run(max_wait=2)
-        self.wait_for(self.check_for_row_in_list_table, f'2: {input_text_2}').run(max_wait=2)
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'2: {input_text_2}')
 
         # self.fail('Finish the test!')
 
@@ -35,10 +35,10 @@ class NewVisitorTest(base.FunctionalTest):
         # user1
         user1_text_1 = 'Compre penas de pavão'
         user1_text_2 = 'Use penas de pavão para fazer um fly'
-        self.wait_for(self.submit_data_by_post, user1_text_1).run(max_wait=2)
-        self.wait_for(self.submit_data_by_post, user1_text_2).run(max_wait=2)
-        self.wait_for(self.check_for_row_in_list_table, f'2: {user1_text_2}').run(max_wait=2)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {user1_text_1}').run(max_wait=2)
+        self.until(max_wait=2).wait(self.submit_data_by_post, user1_text_1)
+        self.until(max_wait=2).wait(self.submit_data_by_post, user1_text_2)
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'2: {user1_text_2}')
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {user1_text_1}')
 
         user1_list_url = self.browser.current_url
         self.assertRegex(user1_list_url, '/lists/.+')
@@ -54,7 +54,7 @@ class NewVisitorTest(base.FunctionalTest):
 
         user2_text_1 = 'Compre leite'
         self.submit_data_by_post(user2_text_1)
-        self.wait_for(self.check_for_row_in_list_table, f'1: {user2_text_1}').run(max_wait=2)
+        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {user2_text_1}')
 
         user2_list_url = self.browser.current_url
         self.assertRegex(user2_list_url, '/lists/.+')
