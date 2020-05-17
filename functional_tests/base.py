@@ -47,8 +47,11 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def submit_data_by_post(self, text, id_input='id_new_item'):
-        inputbox = self.browser.find_element_by_id(id_input)
+    def get_item_input_box(self, id_input='id_text'):
+        return self.browser.find_element_by_id(id_input)
+
+    def submit_data_by_post(self, text, id_input='id_text'):
+        inputbox = self.get_item_input_box(id_input)
         inputbox.clear()
         inputbox.send_keys(text)
         inputbox.send_keys(Keys.ENTER)

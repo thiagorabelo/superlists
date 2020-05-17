@@ -11,7 +11,7 @@ class ItemValidationTest(base.FunctionalTest):
         # item vazio na lista teclando enter na caixa de diálogo
         # vazia
         self.browser.get(self.live_server_url)
-        self.browser.find_element_by_id('id_new_item').send_keys(base.Keys.ENTER)
+        self.browser.find_element_by_id('id_text').send_keys(base.Keys.ENTER)
 
         # A página inicial é atualizada e há uma mensagem de erro
         # informando que itens da lista não podem ser vazios.
@@ -30,7 +30,7 @@ class ItemValidationTest(base.FunctionalTest):
 
         # De sacanagem, ela tenta submeter um segundo item em branco
         # na lista
-        self.browser.find_element_by_id('id_new_item').send_keys(base.Keys.ENTER)
+        self.browser.find_element_by_id('id_text').send_keys(base.Keys.ENTER)
 
         # Ele recebe um aviso semelhante na página da lista.
         self.until(max_wait=3, step_wait=1).wait(
