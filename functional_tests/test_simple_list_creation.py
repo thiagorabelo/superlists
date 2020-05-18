@@ -37,8 +37,8 @@ class NewVisitorTest(base.FunctionalTest):
         user1_text_2 = 'Use penas de pavão para fazer um fly'
         self.until(max_wait=2).wait(self.submit_data_by_post, user1_text_1)
         self.until(max_wait=2).wait(self.submit_data_by_post, user1_text_2)
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'2: {user1_text_2}')
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {user1_text_1}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'2: {user1_text_2}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {user1_text_1}')
 
         user1_list_url = self.browser.current_url
         self.assertRegex(user1_list_url, '/lists/.+')

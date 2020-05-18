@@ -11,37 +11,46 @@ class ItemValidationTest(base.FunctionalTest):
         # item vazio na lista teclando enter na caixa de diálogo
         # vazia
         self.browser.get(self.live_server_url)
-        self.browser.find_element_by_id('id_text').send_keys(base.Keys.ENTER)
+        self.get_item_input_box().send_keys(base.Keys.ENTER)
 
-        # A página inicial é atualizada e há uma mensagem de erro
-        # informando que itens da lista não podem ser vazios.
-        self.until(max_wait=3, step_wait=1).wait(
-            lambda: self.assertEqual(
-                self.browser.find_element_by_css_selector('.has-error').text,
-                "You can't have an empty list item"
-            )
+        # O navegador intercepta a requisição e não carrega a
+        # página da lista
+        self.until(max_wait=1).wait(
+            lambda: self.browser.find_element_by_css_selector('#id_text:invalid')
         )
 
-        # Ele tenta novamente com um texto para o item e desta vez
-        # funciona
+        # O usuário começa a digitar um texto para o novo item e o
+        # erro desaparece
         text_1 = 'Compre leite'
-        self.until(max_wait=3, step_wait=1).wait(self.submit_data_by_post, text_1)
+        self.get_item_input_box().send_keys(text_1)
+        self.until(max_wait=1).wait(
+            lambda: self.browser.find_element_by_css_selector('#id_text:valid')
+        )
+
+        # O usuário pode submeter o item com sucesso
+        self.get_item_input_box().send_keys(base.Keys.ENTER)
         self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
 
-        # De sacanagem, ela tenta submeter um segundo item em branco
-        # na lista
-        self.browser.find_element_by_id('id_text').send_keys(base.Keys.ENTER)
+        # De sacanagem, o usuário escroto tenta submeter um segundo item
+        # em branco na lista
+        self.get_item_input_box().send_keys(base.Keys.ENTER)
 
-        # Ele recebe um aviso semelhante na página da lista.
-        self.until(max_wait=3, step_wait=1).wait(
-            lambda: self.assertEqual(
-                self.browser.find_element_by_css_selector('.has-error').text,
-                "You can't have an empty list item"
-            )
+        # Novamente o navegador acha isso um absurdo e não concorda
+        # em continuar com tal disparate.
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
+        self.until(max_wait=1).wait(
+            lambda: self.browser.find_element_by_css_selector('#id_text:invalid')
         )
 
-        # Isso pode ser corrigido preenchendo o item com um texto
+        # O usuário baixa o facho e resolve seguir as normas,
+        # preenchendo o item com um texto.
         text_2 = 'Faça chá'
-        self.until(max_wait=3, step_wait=1).wait(self.submit_data_by_post, text_2)
+        self.get_item_input_box().send_keys(text_2)
+        self.until(max_wait=1).wait(
+            lambda: self.browser.find_element_by_css_selector('#id_text:valid')
+        )
+
+        # Pronto, agora está tudo como esperado.
+        self.get_item_input_box().send_keys(base.Keys.ENTER)
         self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
         self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'2: {text_2}')
