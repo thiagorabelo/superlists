@@ -18,6 +18,10 @@ from django.contrib import admin
 
 from . import views
 
+
+app_name = 'lists'
+
+
 urlpatterns = [
     url(r'^new$', views.new_list, name='new_list'),
     url(r'^(?P<list_id>\d+)/$', views.view_list, name='view_list'),

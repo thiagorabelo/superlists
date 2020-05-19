@@ -18,6 +18,8 @@ from django.contrib import admin
 
 from lists import views as lists_views
 
+app_name = 'superlists'
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

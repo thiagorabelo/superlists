@@ -35,5 +35,13 @@
         "**/node_modules/**": true,
         "**/__pycache__/**": true,
     },
-    "emmet.includeLanguages": {"django-html": "html"}
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "${env:HOME}/.virtualenvs/superlists/bin/pytest",
+    "python.testing.pytestArgs": [
+        "--ds=superlists.settings"
+    ]
 }
