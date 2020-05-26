@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django import forms
 
-from .models import Item
+from .models import Item, List
 
 
 EMPTY_ITEM_ERROR = "You can't have a empty list item"
@@ -30,6 +30,19 @@ class ItemForm(forms.ModelForm):
 class ExistingListItemForm(ItemForm):
     class Meta(ItemForm.Meta):
         fields = ('list', 'text')
+
+    def __init__(self, data=None, list_=None, **kwargs):
+        if data and 'list' not in data:
+            if not list_:
+                raise ValueError('list must be in data or in list_ parameter')
+            data = data.copy()
+
+            if isinstance(list_, List):
+                data.update({'list': list_.pk})
+            else:
+                data.update({'list': list_})
+
+        super().__init__(data=data, **kwargs)
 
     def save(self, commit=True):  # pylint: disable=arguments-differ
         return forms.ModelForm.save(self, commit=commit)

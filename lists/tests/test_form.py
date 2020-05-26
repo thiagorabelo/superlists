@@ -31,6 +31,12 @@ class ItemFormTest(TestCase):
 
 class ExistingListItemFormTest(TestCase):
 
+    def test_call_form_with_expected_parameters(self):
+        list_ = List.objects.create()
+        ExistingListItemForm(data={'list': list_.pk, 'text': 'virgi'})
+        with self.assertRaises(ValueError):
+            ExistingListItemForm(data={'text': 'virgi'})
+
     def test_form_renders_item_text_input(self):
         list_ = List.objects.create()
         form = ExistingListItemForm(initial={'list': list_})
@@ -38,7 +44,7 @@ class ExistingListItemFormTest(TestCase):
 
     def test_form_validation_for_bank_lines(self):
         list_ = List.objects.create()
-        form = ExistingListItemForm(data={'text': ''}, initial={'list': list_})
+        form = ExistingListItemForm(data={'text': '', 'list': list_})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR])
 
