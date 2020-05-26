@@ -53,7 +53,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     def submit_data_by_post(self, text, id_input='id_text'):
         inputbox = self.get_item_input_box(id_input)
         inputbox.clear()
+        time.sleep(0.1)
         inputbox.send_keys(text)
+        time.sleep(0.2)
         inputbox.send_keys(Keys.ENTER)
 
     def check_for_row_in_list_table(self, row_text):
