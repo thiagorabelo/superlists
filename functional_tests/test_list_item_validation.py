@@ -1,9 +1,15 @@
 # pylint: disable=too-many-ancestors
 
+from unittest import skip
+
 from . import base
 
 
 class ItemValidationTest(base.FunctionalTest):
+
+    def get_error_element(self, css_selector='.has-error'):
+        return self.browser.find_element_by_css_selector(css_selector)
+
 
     # @skip("Este teste está incompleto")
     def test_can_not_add_empty_list_items(self):
@@ -65,6 +71,24 @@ class ItemValidationTest(base.FunctionalTest):
 
         self.submit_data_by_post(text_1)
         self.until(max_wait=2).wait(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
+            self.get_error_element().text,
             "You've already got this in your list"
+        ))
+
+    #@skip
+    def test_error_messages_are_cleared_on_input(self):
+        text_1 = 'Brincadeiras muito grossas'
+        self.browser.get(self.live_server_url)
+        self.submit_data_by_post(text_1)
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {text_1}')
+        self.submit_data_by_post(text_1)
+
+        self.until(max_wait=3).wait(lambda: self.assertTrue(
+            self.get_error_element().is_displayed()
+        ))
+
+        self.get_item_input_box().send_keys('a')
+
+        self.until(max_wait=2).wait(lambda: self.assertFalse(
+            self.get_error_element().is_displayed()
         ))
