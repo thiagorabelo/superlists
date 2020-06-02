@@ -17,7 +17,7 @@
                 {% else %}
                     <form method="POST" action="{% url 'accounts:send_login_email' %}">
                         {% csrf_token %}
-                        Enter email to log in: <input type="text" name="email">
+                        Enter email to log in: <input type="text" name="email" id="id_email">
                     </form>
                 {% endif %}
             </div>
