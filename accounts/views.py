@@ -15,7 +15,7 @@ def send_login_email(request):
     print(f'saving uid {uid} for email {email}', file=sys.stderr)
     url = request.build_absolute_uri(f'/accounts/login/?uid={uid}')
     send_mail(
-        'Your login link for Superlists',
+        'Your login link for Goat Testing',
         f'Use this link to log in:\n\n{url}',
         'noreply@goat.testing.org',
         [email],
