@@ -9,6 +9,19 @@
     </head>
     <body>
         <div class="container">
+
+
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <a href="/" class="navbar-brand">Goat Testing</a>
+                    <form action="#" class="navbar-form navbar-right" method="POST">
+                        {% csrf_token %}
+                        <span>Enter email to Log in:</span>
+                        <input type="text" id="id_email" class="form-control" name="email"/>
+                    </form>
+                </div>
+            </nav>
+
             <div class="row">
                 <div class="col-md-6 col-md-offset-3 jumbotron">
                     <div class="text-center">
