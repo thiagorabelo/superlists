@@ -20,12 +20,12 @@ class NewVisitorTest(base.FunctionalTest):
 
         input_text_1 = 'Compre penas de pavão'
         self.submit_data_by_post(input_text_1)
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
 
         input_text_2 = 'Usar penas de pavão para fazer um fly'
         self.submit_data_by_post(input_text_2)
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'2: {input_text_2}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'1: {input_text_1}')
+        self.until(max_wait=3).wait(self.check_for_row_in_list_table, f'2: {input_text_2}')
 
         # self.fail('Finish the test!')
 

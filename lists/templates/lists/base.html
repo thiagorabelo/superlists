@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="/static/goat-ico.png" />
         <title>To-Do lists</title>
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/css/base.css">
@@ -14,13 +15,33 @@
             <nav class="navbar navbar-default" role="navigation">
                 <div class="container-fluid">
                     <a href="/" class="navbar-brand">Goat Testing</a>
-                    <form action="#" class="navbar-form navbar-right" method="POST">
-                        {% csrf_token %}
-                        <span>Enter email to Log in:</span>
-                        <input type="text" id="id_email" class="form-control" name="email"/>
-                    </form>
+                    {% if user.is_authenticated %}
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="navbar-text">Logged in as {{ user.email }}</li>
+                            <li><a href="#">Log out</a></li>
+                        </ul>
+                    {% else %}
+                        <form class="navbar-form navbar-right"
+                            action="{% url 'accounts:send_login_email' %}"
+                            method="POST">
+                            {% csrf_token %}
+                            <span>Enter email to Log in:</span>
+                            <input type="text" id="id_email" class="form-control" name="email"/>
+                        </form>
+                    {% endif %}
                 </div>
             </nav>
+
+            {% if messages %}
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        {% for message in messages %}
+                            <div class="messages alert alert-{% if message.level_tag == 'success' %}success{% else %}warning{% endif %}"
+                                >{{ message }} <i class="glyphicon glyphicon-envelope"></i></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
             <div class="row">
                 <div class="col-md-6 col-md-offset-3 jumbotron">
