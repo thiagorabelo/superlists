@@ -158,6 +158,7 @@ LOGGING = {
 # sudo apt install dovecot-imapd dovecot-pop3d  # Faltou no link acima da Digital Ocean
 # https://unix.stackexchange.com/a/366291  # Acrescenta algo que está faltando no link acima da Digital Ocean
 # https://www.tutorialspoint.com/linux_admin/linux_admin_set_up_postfix_mta_and_imap_pop3.htm  # Ver sessão "Install Dovecot IMAP and POP3 Server"
+# https://blog.remontti.com.br/3744
 
 # python -m smtpd -c DebuggingServer -n localhost:8025
 EMAIL_HOST = 'localhost' if DEBUG else 'testing.org'  # testing.org => VirtualBox with Postfix
