@@ -155,7 +155,8 @@ LOGGING = {
 # Email
 # https://www.hardware.com.br/tutoriais/servidor-emails/instalando-postfix.html
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-postfix-email-server-with-dovecot-dynamic-maildirs-and-lmtp
-# https://unix.stackexchange.com/a/366291  # Acrescenta algo que está faltando no link acima da digital ocean
+# sudo apt install dovecot-imapd dovecot-pop3d  # Faltou no link acima da Digital Ocean
+# https://unix.stackexchange.com/a/366291  # Acrescenta algo que está faltando no link acima da Digital Ocean
 # https://www.tutorialspoint.com/linux_admin/linux_admin_set_up_postfix_mta_and_imap_pop3.htm  # Ver sessão "Install Dovecot IMAP and POP3 Server"
 
 # python -m smtpd -c DebuggingServer -n localhost:8025
