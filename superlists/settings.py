@@ -161,9 +161,10 @@ LOGGING = {
 # https://blog.remontti.com.br/3744
 
 # python -m smtpd -c DebuggingServer -n localhost:8025
-EMAIL_HOST = 'localhost' if DEBUG else 'testing.org'  # testing.org => VirtualBox with Postfix
-EMAIL_USE_TLS = False  # True
-EMAIL_PORT = 25  # 8025 if DEBUG else 587
+# testing.org => VirtualBox with Postfix
+EMAIL_HOST = 'localhost' if DEBUG else os.environ.get('EMAIL_HOST', 'testing.org')
+EMAIL_USE_TLS = bool(int(os.environ.get('EMAIL_USE_TLS', '0')))
+EMAIL_PORT = 25 if DEBUG else int(os.environ.get('EMAIL_PORT', '25'))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 

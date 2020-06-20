@@ -5,9 +5,23 @@ Description=Gunicorn server for superlists
 Restart=on-failure
 User=thiago
 WorkingDirectory=/home/thiago/sites/goat.testing.org/source
-ExecStart=/home/thiago/sites/goat.testing.org/virtualenv/bin/gunicorn \
-    --bind unix:/tmp/goat.testing.org.socket \
-    superlists.wsgi:application
+
+Environment=EMAIL_HOST=testing.org
+Environment=EMAIL_USE_TLS=0
+Environment=EMAIL_PORT=25
+# Environment=EMAIL_HOST_USER=
+# Environment=EMAIL_HOST_PASSWORD=
+
+# https://stackoverflow.com/a/54232531
+# StandardOutput=file:/home/thiago/sites/goat.testing.org/access.log
+# StandardError=file:/home/thiago/sites/goat.testing.org/error.log
+
+ExecStart=/home/thiago/sites/goat.testing.org/virtualenv/bin/gunicorn superlists.wsgi:application \
+    --bind unix:/tmp/goat.testing.org.socket
+    # \
+    # --capture-output \
+    # --access-logfile ../access.log \
+    # --error-logfile ../error.log
 
 [Install]
 WantedBy=multi-user.target
