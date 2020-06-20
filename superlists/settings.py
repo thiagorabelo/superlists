@@ -152,16 +152,20 @@ LOGGING = {
     'root': {'level': 'INFO'}
 }
 
-
 # Email
-EMAIL_HOST = 'localhost'
-EMAIL_USE_TLS = False
-EMAIL_PORT = 8025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+# https://www.hardware.com.br/tutoriais/servidor-emails/instalando-postfix.html
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-postfix-email-server-with-dovecot-dynamic-maildirs-and-lmtp
+# https://unix.stackexchange.com/a/366291  # Acrescenta algo que está faltando no link acima da digital ocean
+# https://www.tutorialspoint.com/linux_admin/linux_admin_set_up_postfix_mta_and_imap_pop3.htm  # Ver sessão "Install Dovecot IMAP and POP3 Server"
+
+# python -m smtpd -c DebuggingServer -n localhost:8025
+EMAIL_HOST = 'localhost' if DEBUG else 'testing.org'  # testing.org => VirtualBox with Postfix
+EMAIL_USE_TLS = False  # True
+EMAIL_PORT = 25  # 8025 if DEBUG else 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 if not DEBUG:
-    # python -m smtpd -c DebuggingServer -n localhost:8025
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
