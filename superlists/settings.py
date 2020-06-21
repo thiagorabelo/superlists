@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'lists',
     'accounts',
+    'functional_tests'
 ]
 
 
@@ -162,7 +163,7 @@ LOGGING = {
 
 # python -m smtpd -c DebuggingServer -n localhost:8025
 # testing.org => VirtualBox with Postfix
-EMAIL_HOST = 'localhost' if DEBUG else os.environ.get('EMAIL_HOST', 'testing.org')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost' if DEBUG else 'testing.org')
 EMAIL_USE_TLS = bool(int(os.environ.get('EMAIL_USE_TLS', '0')))
 EMAIL_PORT = 25 if DEBUG else int(os.environ.get('EMAIL_PORT', '25'))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
@@ -172,3 +173,5 @@ if not DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
