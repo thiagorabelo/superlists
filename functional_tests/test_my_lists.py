@@ -23,7 +23,7 @@ class MyListTest(FunctionalTest):
         ))
 
     def test_logged_in_users_list_are_saved_as_my_list(self):
-        email = 'edith@example.com'
+        email = 'edith@testing.org'
         self.browser.get(self.live_server_url)
         self.wait_to_be_logged_out(email)
 
