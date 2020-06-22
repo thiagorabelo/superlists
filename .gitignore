@@ -2,3 +2,4 @@ deploy/static/**
 db.sqlite3
 geckodriver.log
 *.pyc
+.env

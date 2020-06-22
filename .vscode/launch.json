@@ -42,6 +42,7 @@
             "env": {
                 "PYTHONUNBUFFERED": "1"
             },
+            "envFile": "${workspaceFolder}/.env",
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "test",
