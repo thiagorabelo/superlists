@@ -66,8 +66,7 @@ class ItemValidationTest(base.FunctionalTest):
 
         text_1 = 'Compre galochas'
 
-        self.submit_data_by_post(text_1)
-        self.until(max_wait=2).wait(self.check_for_row_in_list_table, f'1: {text_1}')
+        self.add_list_item(text_1)
 
         self.submit_data_by_post(text_1)
         self.until(max_wait=2).wait(lambda: self.assertEqual(

@@ -4,11 +4,14 @@ import functools
 import inspect
 import os
 import time
+import typing
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+
+from . import server_tools
 
 
 def wait(func=None, max_wait=10, step_wait=0.5):
@@ -35,7 +38,26 @@ def wait(func=None, max_wait=10, step_wait=0.5):
     return decorator
 
 
-class FunctionalTest(StaticLiveServerTestCase):
+class AdditionalAssertionsMixin:
+
+    def assertEmpty(self, obj):  # pylint: disable=invalid-name
+        if not isinstance(obj, typing.Iterable):
+            raise AssertionError(f"{obj} is not an Iterable")
+        try:
+            self.assertFalse(obj)
+        except AssertionError as ex:
+            raise AssertionError(f"{obj} is not empty") from ex
+
+    def assertNotEmpty(self, obj):  # pylint: disable=invalid-name
+        if not isinstance(obj, typing.Iterable):
+            raise AssertionError(f"{obj} is not an Iterable")
+
+        try:
+            self.assertTrue(obj)
+        except AssertionError as ex:
+            raise AssertionError(f"{obj} is empty") from ex
+
+class FunctionalTest(StaticLiveServerTestCase, AdditionalAssertionsMixin):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -43,6 +65,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = f'http://{self.staging_server}'
+            server_tools.configure_fabric()
 
     def tearDown(self):
         self.browser.quit()
@@ -74,6 +97,15 @@ class FunctionalTest(StaticLiveServerTestCase):
                 return dummy(*args, **kwargs)
 
         return Wait()
+
+    def add_list_item(self, item_text, css_selector='#id_list_table tr'):
+        num_rows = len(self.browser.find_elements_by_css_selector(css_selector))
+        self.submit_data_by_post(item_text)
+        item_number = num_rows + 1
+        self.wait_for_row_in_list_table(f'{item_number}: {item_text}')
+
+    def wait_for_row_in_list_table(self, row_text):
+        self.until(max_wait=5).wait(self.check_for_row_in_list_table, row_text)
 
     @wait(max_wait=5)
     def wait_to_be_logged_in(self, email):

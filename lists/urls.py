@@ -25,4 +25,5 @@ app_name = 'lists'
 urlpatterns = [
     url(r'^new$', views.new_list, name='new_list'),
     url(r'^(?P<list_id>\d+)/$', views.view_list, name='view_list'),
+    url(r'^users/(.+)/$', views.my_lists, name='my_lists'),
 ]
