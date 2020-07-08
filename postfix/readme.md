@@ -14,9 +14,9 @@ necessário usar alguma solução de terceiros.
 Vamos passar a variável de ambiente `DEBIAN_PRIORITY=low` para nosso comando de
 instalação para forçá-lo a responder a alguns prompts adicionais:
 
-    ```sh
-    sudo DEBIAN_PRIORITY=low apt install postfix
-    ```
+```sh
+sudo DEBIAN_PRIORITY=low apt install postfix
+```
 
 O assistente de instalação fará algumas perguntas, sendo elas (dependendo da
 instalação, essas perguntas podem aparecer em inglês):
@@ -79,18 +79,18 @@ Nossa instância do Postfix usará o banco de dados [Postgres](https://www.postg
 como _backend_ para armazenar os usuários do serviço de email. Portando devemos
 instalar os pacotes necessários:
 
-    ```sh
-    sudo apt install postgresql postfix-pgsql
-    ```
+```sh
+sudo apt install postgresql postfix-pgsql
+```
 
 Instale também o [Dovecot](https://www.dovecot.org/), um servidor de
 [IMAP](https://en.wikipedia.org/wiki/Internet_Message_Access_Protocol) e
 [POP3](https://en.wikipedia.org/wiki/Post_Office_Protocol) open source para
 sistemas Linux e UNIX.
 
-    ```sh
-    sudo apt install dovecot-lmtpd dovecot-pgsql dovecot-imapd dovecot-pop3d
-    ```
+```sh
+sudo apt install dovecot-lmtpd dovecot-pgsql dovecot-imapd dovecot-pop3d
+```
 
 ## Configuração do banco de dados Postgres
 
@@ -99,71 +99,71 @@ postgres em execução! Mas, a partir de uma nova instalação do postgres, vamo
 configurar a autenticação para que possamos fornecer acesso ao dovecot ao banco
 de dados. Adicione o seguinte ao `/etc/postgresql/10/main/pg_ident.conf`:
 
-    ```pg_ident.conf
-    mailmap         dovecot                 mailreader
-    mailmap         postfix                 mailreader
-    mailmap         root                    mailreader
-    ```
+```pg_ident.conf
+mailmap         dovecot                 mailreader
+mailmap         postfix                 mailreader
+mailmap         root                    mailreader
+```
 
 E o seguinte para `/etc/postgresql/10/main/pg_hba.conf` (Alerta: certifique-se
 de adicioná-lo logo após o bloco de comentários _Put your actual configuration here_!
 Caso contrário, uma das entradas padrão poderá pegar primeiro e a autenticação
 do banco de dados falhará.)
 
-    ```pg_hba.conf
-    local       mail    all     peer map=mailmap
-    ```
+```pg_hba.conf
+local       mail    all     peer map=mailmap
+```
 
 Em seguida, recarregue o postgresql (`sudo systemctl restart postgresql.service`).
 Agora configure o banco de dados:
 
-    ```sh
-    $ sudo -u postgres psql
-    postgres=# CREATE USER mailreader;
-    postgres=# REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-    postgres=# REVOKE USAGE ON SCHEMA public FROM PUBLIC;
-    postgres=# GRANT CREATE ON SCHEMA public TO postgres;
-    postgres=# GRANT USAGE ON SCHEMA public TO postgres;
-    postgres=# CREATE DATABASE mail WITH OWNER mailreader;
-    postgres=# \q
+```sh
+$ sudo -u postgres psql
+postgres=# CREATE USER mailreader;
+postgres=# REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+postgres=# REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+postgres=# GRANT CREATE ON SCHEMA public TO postgres;
+postgres=# GRANT USAGE ON SCHEMA public TO postgres;
+postgres=# CREATE DATABASE mail WITH OWNER mailreader;
+postgres=# \q
 
-    $ sudo psql -U mailreader -d mail
-    postgres=# \c mail
+$ sudo psql -U mailreader -d mail
+postgres=# \c mail
 
-    mail=# CREATE TABLE aliases (
-        alias text NOT NULL,
-        email text NOT NULL
-    );
-    mail=# CREATE TABLE users (
-        email text NOT NULL,
-        password text NOT NULL,
-        maildir text NOT NULL,
-        created timestamp with time zone DEFAULT now()
-    );
-    mail=# ALTER TABLE aliases OWNER TO mailreader;
-    mail=# ALTER TABLE users OWNER TO mailreader;
-    mail=# \q
-    ```
+mail=# CREATE TABLE aliases (
+    alias text NOT NULL,
+    email text NOT NULL
+);
+mail=# CREATE TABLE users (
+    email text NOT NULL,
+    password text NOT NULL,
+    maildir text NOT NULL,
+    created timestamp with time zone DEFAULT now()
+);
+mail=# ALTER TABLE aliases OWNER TO mailreader;
+mail=# ALTER TABLE users OWNER TO mailreader;
+mail=# \q
+```
 
 Você pode adicionar caixas de correio virtuais como esta, a partir do shell:
 
-    ```sh
-    $ sudo doveadm pw -s sha512 -r 100
-    Enter new password: ...
-    Retype new password: ...
-    {SHA512}.............................................................==
+```sh
+$ sudo doveadm pw -s sha512 -r 100
+Enter new password: ...
+Retype new password: ...
+{SHA512}.............................................................==
 
-    $ sudo psql -U mailreader -d mail
-    mail=# INSERT INTO users (
-        email,
-        password,
-        maildir
-    ) VALUES (
-        'foo@thomas.com',
-        '{SHA512}.............................................................==',
-        'foo/'
-    );
-    ```
+$ sudo psql -U mailreader -d mail
+mail=# INSERT INTO users (
+    email,
+    password,
+    maildir
+) VALUES (
+    'foo@thomas.com',
+    '{SHA512}.............................................................==',
+    'foo/'
+);
+```
 
 ## Instalação do Dovecot
 
@@ -173,142 +173,142 @@ usuário do sistema configurado para ele) e o diretório para os emails
 primeiro (você pode usar `/var/mail`, mas que tradicionalmente usa o formato
 mbox, enquanto usaremos o formato maildir superior):
 
-    ```sh
-    $ sudo adduser --system --no-create-home --uid 500 --group \
-                   --disabled-password --disabled-login \
-                   --gecos 'dovecot virtual mail user' vmail
-    $ sudo mkdir /home/mailboxes
-    $ sudo chown vmail:vmail /home/mailboxes
-    $ sudo chmod 700 /home/mailboxes
-    ```
+```sh
+$ sudo adduser --system --no-create-home --uid 500 --group \
+               --disabled-password --disabled-login \
+               --gecos 'dovecot virtual mail user' vmail
+$ sudo mkdir /home/mailboxes
+$ sudo chown vmail:vmail /home/mailboxes
+$ sudo chmod 700 /home/mailboxes
+```
 
 Agora salve a seguinte configuração como `/etc/dovecot/dovecot-sql.conf`
 
-    ```dovecot-sql.conf
-    driver = pgsql
-    connect = host=/var/run/postgresql/ dbname=mail user=mailreader
-    default_pass_scheme = SHA512
-    password_query = SELECT email as user, password FROM users WHERE email = '%u'
-    user_query = SELECT email as user, 'maildir:/home/mailboxes/maildir/' || maildir as mail, '/home/mailboxes/home/'||maildir as home, 500 as uid, 500 as gid FROM users WHERE email = '%u'
-    ```
+```dovecot-sql.conf
+driver = pgsql
+connect = host=/var/run/postgresql/ dbname=mail user=mailreader
+default_pass_scheme = SHA512
+password_query = SELECT email as user, password FROM users WHERE email = '%u'
+user_query = SELECT email as user, 'maildir:/home/mailboxes/maildir/' || maildir as mail, '/home/mailboxes/home/'||maildir as home, 500 as uid, 500 as gid FROM users WHERE email = '%u'
+```
 
 Certifique-se que este arquivo pertence ao `root` e mude as permissões para 600.
 
 Agora abra `/etc/dovecot/dovecot.conf` e edite as configurações de `passdb` e
 `userdb` para ficar assim:
 
-    ```dovecot.conf
-    passdb {
-        driver = sql
-        args = /etc/dovecot/dovecot-sql.conf
-    }
+```dovecot.conf
+passdb {
+    driver = sql
+    args = /etc/dovecot/dovecot-sql.conf
+}
 
-    userdb {
-        driver = prefetch
-    }
+userdb {
+    driver = prefetch
+}
 
-    # The userdb below is used only by lda.
-    userdb {
-        driver = sql
-        args = /etc/dovecot/dovecot-sql.conf
-    }
-    ```
+# The userdb below is used only by lda.
+userdb {
+    driver = sql
+    args = /etc/dovecot/dovecot-sql.conf
+}
+```
 
 Continuando no mesmo arquivo, mude a sub-rotina de protocolos para:
 
-    ```dovecot.conf
-    protocols = imap lmtp pop3
-    ```
+```dovecot.conf
+protocols = imap lmtp pop3
+```
 
 E finalmente, ainda no mesmo arquivo:
 
-    ```dovecot.conf
-    service lmtp {
-      unix_listener /var/spool/postfix/private/dovecot-lmtp {
-        group = postfix
-        mode = 0600
-        user = postfix
-      }
+```dovecot.conf
+service lmtp {
+    unix_listener /var/spool/postfix/private/dovecot-lmtp {
+    group = postfix
+    mode = 0600
+    user = postfix
     }
+}
 
-    protocol lmtp {
-      postmaster_address=postmaster@thomas.org
-      hostname=mail.thomas.org
-    }
-    ```
+protocol lmtp {
+    postmaster_address=postmaster@thomas.org
+    hostname=mail.thomas.org
+}
+```
 
 ## Postfix
 
 Agora precisamos informar ao postfix para entregar as mensagens diretamente para
 o dovecot. Abra `/etc/postfix/main.cf` e adicione:
 
-    ```main.cf
-    mailbox_transport = lmtp:unix:private/dovecot-lmtp
-    ```
+```main.cf
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+```
 
 ao fim. Agora precisamos definir a configuração do banco de dados para o postfix.
 
 Crie o arquivo `/etc/postfix/pgsql-aliases.cf` e digite:
 
-    ```pgsql-aliases.cf
-    user=mailreader
-    dbname=mail
-    table=aliases
-    select_field=alias
-    where_field=email
-    hosts=unix:/var/run/postgresql
-    ```
+```pgsql-aliases.cf
+user=mailreader
+dbname=mail
+table=aliases
+select_field=alias
+where_field=email
+hosts=unix:/var/run/postgresql
+```
 
 Em seguida, crie o arquivo `/etc/postfix/pgsql-boxes.cf` e digite:
 
-    ```pgsql-boxes.cf
-    user=mailreader
-    dbname=mail
-    table=users
-    select_field=email
-    where_field=email
-    hosts=unix:/var/run/postgresql/
-    ```
+```pgsql-boxes.cf
+user=mailreader
+dbname=mail
+table=users
+select_field=email
+where_field=email
+hosts=unix:/var/run/postgresql/
+```
 
 Agora altere a linha `alias_maps` em `main.cf` para ler o arquivo
 `pgsql-aliases.cf`:
 
-    ```main.cf
-    alias_maps = hash:/etc/aliases proxy:pgsql:/etc/postfix/pgsql-aliases.cf
-    ```
+```main.cf
+alias_maps = hash:/etc/aliases proxy:pgsql:/etc/postfix/pgsql-aliases.cf
+```
 
 e a linha `local_recipient_maps` para ler o arquivo `pgsql-boxes.cf`:
 
-    ```main.cf
-    local_recipient_maps = proxy:pgsql:/etc/postfix/pgsql-boxes.cf $alias_maps
-    ```
+```main.cf
+local_recipient_maps = proxy:pgsql:/etc/postfix/pgsql-boxes.cf $alias_maps
+```
 
 e adicione sua rede local na configuração `mynetworks` para que o Postfix
 aceite conexões a partir de sua rede, por exemplo:
 
-    ```main.cf
-    mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 192.168.1.0/24
-    ```
+```main.cf
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 192.168.1.0/24
+```
 
 Adicione os nomes que você escolheu no arquivo `/etc/hosts`, tanto na máquina
 virtual onde está instalado o Postfix, quanto na máquina onde serão executados
 os testes. Na máquina virtual:
 
-    ```hosts
-    127.0.0.1       mail.thomas.com pop.thomas.com thomas.com
-    ```
+```hosts
+127.0.0.1       mail.thomas.com pop.thomas.com thomas.com
+```
 
 e na máquina onde serão executados os testes:
 
-    ```hosts
-    192.168.1.5       mail.thomas.com pop.thomas.com thomas.com
-    ```
+```hosts
+192.168.1.5       mail.thomas.com pop.thomas.com thomas.com
+```
 
 ## Terminando
 
 Agora basta recarregar:
 
-    ```sh
-    $ postfix reload
-    $ service dovecot restart
-    ```
+```sh
+$ postfix reload
+$ service dovecot restart
+```
