@@ -155,6 +155,7 @@ LOGGING = {
 
 # Email
 # https://www.hardware.com.br/tutoriais/servidor-emails/instalando-postfix.html
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-on-ubuntu-16-04
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-postfix-email-server-with-dovecot-dynamic-maildirs-and-lmtp
 # sudo apt install dovecot-imapd dovecot-pop3d  # Faltou no link acima da Digital Ocean
 # https://unix.stackexchange.com/a/366291  # Acrescenta algo que está faltando no link acima da Digital Ocean
@@ -174,4 +175,3 @@ if not DEBUG:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

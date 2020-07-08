@@ -1,11 +1,13 @@
 {
-    "python.pythonPath": "${env:HOME}/.virtualenvs/superlists/bin/python",
-    "python.linting.pylintPath": "${env:HOME}/.virtualenvs/superlists/bin/pylint",
+    "editor.rulers": [80, 100],
+
+    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+    "python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
     "python.autoComplete.extraPaths": [
-        "${env:HOME}/.virtualenvs/superlists/lib/python3.6/site-packages"
+        "${workspaceFolder}/.venv/lib/python3.6/site-packages"
     ],
     "python.linting.pylintArgs": [
-        "--rcfile=${env:HOME}/PycharmProjects/superlists/.vscode/pylintrc"
+        "--rcfile=${workspaceFolder}/.vscode/pylintrc"
     ],
     "findFiles.fileExcludeGlob": "**/__pycache__/**",
     "files.exclude": {
@@ -17,7 +19,7 @@
     },
 
     "git.ignoredRepositories": [
-        "/home/thiago/.pyenv"
+        "${env:HOME}/.pyenv"
     ],
 
     "window.zoomLevel": -0.1,
@@ -41,8 +43,10 @@
     },
     "python.testing.unittestEnabled": true,
     "python.testing.pytestEnabled": true,
-    "python.testing.pytestPath": "${env:HOME}/.virtualenvs/superlists/bin/pytest",
+    "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
     "python.testing.pytestArgs": [
         "--ds=superlists.settings"
-    ]
+    ],
+
+    "python.workspaceSymbols.enabled": true
 }

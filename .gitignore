@@ -1,5 +1,8 @@
+.pytest_cache/**
+.vscode/tags
+.venv
 deploy/static/**
-db.sqlite3
-geckodriver.log
 *.pyc
 .env
+db.sqlite3
+geckodriver.log

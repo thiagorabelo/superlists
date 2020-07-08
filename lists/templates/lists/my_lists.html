@@ -1,6 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'lists/base.html' %}
 
 {% block list_form %}{% endblock  %}
+
+{% block header_text %}My lists{% endblock  %}
 
 {% block extra_content %}
     <h2>{{ owner.email }}'s lists</h2>

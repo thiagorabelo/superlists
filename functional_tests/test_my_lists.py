@@ -75,5 +75,5 @@ class MyListTest(FunctionalTest):
         # Faz logout e aopção "My lists" desaparece
         self.browser.find_element_by_link_text('Log out').click()
         self.until(max_wait=5).wait(
-            lambda: self.assertEmpty(self.browser.find_element_by_partial_link_text('My lists'))
+            lambda: self.assertEmpty(self.browser.find_elements_by_link_text('My lists'))
         )
