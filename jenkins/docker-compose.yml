@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  app:
+    build:
+      context: ./app
+    image: goat/jenkins:latest
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./app/jenkins_home:/var/lib/jenkins:rw
+
+    # environment:
+    #   -
+
+    ports:
+      - 8080:8080

@@ -2,6 +2,8 @@
 .vscode/tags
 .venv
 deploy/static/**
+functional_tests/screendumps/**
+jenkins/app/jenkins_home/**
 *.pyc
 .env
 db.sqlite3
