@@ -1,6 +1,7 @@
 {
     "editor.rulers": [80, 100],
 
+    "python.languageServer": "Pylance",
     "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
     "python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
     "python.autoComplete.extraPaths": [
@@ -9,6 +10,19 @@
     "python.linting.pylintArgs": [
         "--rcfile=${workspaceFolder}/.vscode/pylintrc"
     ],
+
+    // Em casos de erros tente executar o pytest pra ver a saída. Por exemplo:
+    // $ pytest --ds=superlists.settings
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+    "python.testing.pytestArgs": [
+        "--ds=superlists.settings",
+        "--ignore-glob=jenkins/**"
+    ],
+    "python.workspaceSymbols.enabled": true,
+
+
     "findFiles.fileExcludeGlob": "**/__pycache__/**",
     "files.exclude": {
         "**/.git": false,
@@ -37,16 +51,9 @@
         "**/.git/subtree-cache/**": true,
         "**/node_modules/**": true,
         "**/__pycache__/**": true,
+        "**/jenkins/app/jenkins_home/**": true
     },
     "emmet.includeLanguages": {
         "django-html": "html"
     },
-    "python.testing.unittestEnabled": true,
-    "python.testing.pytestEnabled": true,
-    "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
-    "python.testing.pytestArgs": [
-        "--ds=superlists.settings"
-    ],
-
-    "python.workspaceSymbols.enabled": true
 }
