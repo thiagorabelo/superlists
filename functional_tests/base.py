@@ -6,6 +6,7 @@ import os
 import time
 import typing
 
+from datetime import datetime
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
@@ -57,7 +58,53 @@ class AdditionalAssertionsMixin:
         except AssertionError as ex:
             raise AssertionError(f"{obj} is empty") from ex
 
-class FunctionalTest(StaticLiveServerTestCase, AdditionalAssertionsMixin):
+
+SCREEN_DUMP_LOCATION = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), 'screendumps'
+)
+
+
+class OnTestFailureTakeScreenshotAndDumpHTMLMixin:
+
+    def tearDown(self):  # pylint: disable=invalid-name
+        if self._test_has_failed():
+            os.makedirs(SCREEN_DUMP_LOCATION, exist_ok=True)
+
+            for idx, handle in enumerate(self.browser.window_handles):
+                self._windowid = idx
+                self.browser.switch_to_window(handle)
+                self.take_screenshot()
+                self.dump_html()
+        super().tearDown()
+
+    def _test_has_failed(self):
+        return any(error for (method, error) in self._outcome.errors)
+
+    def take_screenshot(self):
+        filename = f'{self._get_filename()}.png'
+        print(f'>>> screenshotting to {filename}')
+        self.browser.get_screenshot_as_file(filename)
+
+    def dump_html(self):
+        filename = f'{self._get_filename()}.html'
+        print(f'>>> dumping page HTML to {filename}')
+        with open(filename, 'wt') as html_file:
+            html_file.write(self.browser.page_source)
+
+    def _get_filename(self):
+        timestamp = datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+        return "{folder}/{classname}.{method}-window{windowid}-{timestamp}".format(
+            folder=SCREEN_DUMP_LOCATION,
+            classname=self.__class__.__name__,
+            method=self._testMethodName,
+            windowid=self._windowid,
+            timestamp=timestamp,
+        )
+
+
+class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,
+                     AdditionalAssertionsMixin,
+                     StaticLiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -68,6 +115,9 @@ class FunctionalTest(StaticLiveServerTestCase, AdditionalAssertionsMixin):
             server_tools.configure_fabric()
 
     def tearDown(self):
+        # Chama a funcionalidade que tira screenshots e faz dump do html
+        # em casos de falhas nos testes.
+        super().tearDown()
         self.browser.quit()
 
     def get_item_input_box(self, id_input='id_text'):
