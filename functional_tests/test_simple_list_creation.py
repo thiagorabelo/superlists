@@ -44,7 +44,7 @@ class NewVisitorTest(base.FunctionalTest):
         self.assertRegex(user1_list_url, '/lists/.+')
 
         self.browser.quit()
-        self.browser = webdriver.Firefox()
+        self.browser = self._get_browser()
 
         # user2
         self.browser.get(self.live_server_url)
