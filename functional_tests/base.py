@@ -11,6 +11,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
 
 from . import server_tools
 
@@ -102,12 +103,15 @@ class OnTestFailureTakeScreenshotAndDumpHTMLMixin:
         )
 
 
-class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,
+# TODO: Estudar o "headless" dos navegadores e substituir o QUnit por testes modernos no frontend.
+#         - `lists/static/testes/`.
+#       https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode#Selenium_in_Python
+class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: disable=too-many-ancestors
                      AdditionalAssertionsMixin,
                      StaticLiveServerTestCase):
 
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        self.browser = self._get_browser()
 
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
@@ -119,6 +123,13 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,
         # em casos de falhas nos testes.
         super().tearDown()
         self.browser.quit()
+
+    def _get_browser(self):
+        if os.environ.get('USER_HEADLESS_BROWSER', '0') == '1':
+            options = Options()
+            options.add_argument('--headless')
+            return webdriver.Firefox(options=options)
+        return webdriver.Firefox()
 
     def get_item_input_box(self, id_input='id_text'):
         return self.browser.find_element_by_id(id_input)
