@@ -22,9 +22,14 @@ class ItemForm(forms.ModelForm):
             'text': {'required': EMPTY_ITEM_ERROR}
         }
 
-    def save(self, for_list, commit=True):  # pylint: disable=arguments-differ
-        self.instance.list = for_list
-        return super().save(commit)
+
+class NewListForm(ItemForm):
+
+    def save(self, owner):
+        if owner.is_authenticated:
+            return List.create_new(first_item_text=self.cleaned_data['text'], owner=owner)
+        else:
+            return List.create_new(first_item_text=self.cleaned_data['text'])
 
 
 class ExistingListItemForm(ItemForm):
@@ -43,9 +48,6 @@ class ExistingListItemForm(ItemForm):
                 data.update({'list': list_})
 
         super().__init__(data=data, **kwargs)
-
-    def save(self, commit=True):  # pylint: disable=arguments-differ
-        return forms.ModelForm.save(self, commit=commit)
 
     def validate_unique(self):
         try:

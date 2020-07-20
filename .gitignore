@@ -5,6 +5,7 @@ deploy/static/**
 functional_tests/screendumps/**
 jenkins/app/jenkins_home/**
 *.pyc
+.directory
 .env
 db.sqlite3
 geckodriver.log

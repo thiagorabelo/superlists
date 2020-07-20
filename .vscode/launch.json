@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Test",
+            "type": "python",
+            "request": "test",
+            "console": "internalConsole",
+            "justMyCode": false
+        },
+        {
             "name": "Python: Terminal (integrated)",
             "type": "python",
             "request": "launch",
@@ -23,6 +30,7 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
+            "console": "integratedTerminal",
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "runserver",
