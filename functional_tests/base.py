@@ -7,6 +7,7 @@ import time
 import typing
 
 from datetime import datetime
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
@@ -14,6 +15,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 from . import server_tools
+from .management.sessions import create_pre_authenticated_session
+from .server_tools import create_session_on_server
 
 
 def wait(func=None, max_wait=10, step_wait=0.5):
@@ -111,7 +114,7 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: dis
                      StaticLiveServerTestCase):
 
     def setUp(self):
-        self.browser = self._get_browser()
+        self.browser = self.get_browser()
 
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
@@ -124,8 +127,13 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: dis
         super().tearDown()
         self.browser.quit()
 
-    def _get_browser(self):
-        if os.environ.get('USER_HEADLESS_BROWSER', '0') == '1':
+    def get_browser(self):
+        """
+        Retorna um browser, passando o parâmetro `--headless` (sem interface
+        gráfica) caso a variável de ambiente `USER_HEADLESS_BROWSER` seja
+        definida. Do contrário, um navegador com interface gráfica será retornado.
+        """
+        if os.environ.get('USER_HEADLESS_BROWSER', None):
             options = Options()
             options.add_argument('--headless')
             return webdriver.Firefox(options=options)
@@ -179,3 +187,18 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: dis
         self.browser.find_element_by_name('email')
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertNotIn(email, navbar.text)
+
+    def create_pre_authenticated_session(self, email):
+        if self.staging_server:
+            session_key = create_session_on_server(email)
+        else:
+            session_key = create_pre_authenticated_session(email)
+
+        # Para definir um cookie, precisamos antes acessar o domínio.
+        # As páginas 404 são carregadas mais rapidamente.
+        self.browser.get(self.live_server_url + '/404_no_such_url')
+        self.browser.add_cookie(dict(
+            name=settings.SESSION_COOKIE_NAME,
+            value=session_key,
+            path='/'
+        ))
