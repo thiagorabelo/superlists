@@ -127,7 +127,7 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: dis
         super().tearDown()
         self.browser.quit()
 
-    def get_browser(self):
+    def get_browser(self) -> webdriver.Firefox:
         """
         Retorna um browser, passando o parâmetro `--headless` (sem interface
         gráfica) caso a variável de ambiente `USER_HEADLESS_BROWSER` seja

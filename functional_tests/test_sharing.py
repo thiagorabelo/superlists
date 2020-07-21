@@ -1,5 +1,6 @@
-from selenium import webdriver
 from .base import FunctionalTest
+from .list_page import ListPage
+from .my_lists_page import MyListsPage
 
 
 MARTA_EMAIL = 'marta@testing.org'
@@ -29,14 +30,39 @@ class SharingTest(FunctionalTest):
 
         # Marta acessa a página inicial e começa uma lista
         self.browser = marta_browser
-        self.browser.get(self.live_server_url)
-        self.add_list_item('Get help')
+        marta_item_1 = 'Get Help'
+        list_page = ListPage(self).add_list_item(marta_item_1)
 
         # Ela percebe que há uma opção "Share this list"
-        share_box = self.browser.find_element_by_css_selector(
-            'input[name="share"]'
-        )
+        share_box = list_page.get_share_box()
         self.assertEqual(
             share_box.get_attribute('placeholder'),
             'your-friend@example.com'
         )
+
+        # Ela compartilha sua lista.
+        # A página é atualizada para informar que a lista foi compartilhada
+        # com Jonas
+        list_page.share_list_with(JONAS_EMAIL)
+
+        # Jonas agora acessa a página de listas com seu navegador
+        self.browser = jonas_browser
+        MyListsPage(self).go_to_my_list_page()
+
+        # Ele vê a lista de Marta!
+        self.browser.find_element_by_link_text(marta_item_1).click()
+
+        # Na página de lista, Jonas pode ver que a lista é de Marta
+        self.until(max_wait=5).wait(lambda: self.assertEqual(
+            list_page.get_list_owner(),
+            MARTA_EMAIL
+        ))
+
+        # Ele adiciona um item na lista
+        marta_item_2 = 'Hi Marta'
+        list_page.add_list_item('Hi Marta!')
+
+        # Quando Marta atualzia a página, ela vê o acrescimo feito por Jonas
+        self.browser = marta_browser
+        self.browser.refresh()
+        list_page.wait_for_row_in_list_table(marta_item_2, 2)
