@@ -69,7 +69,7 @@ class ItemValidationTest(base.FunctionalTest):
         self.add_list_item(text_1)
 
         self.submit_data_by_post(text_1)
-        self.until(max_wait=2).wait(lambda: self.assertEqual(
+        self.until(max_wait=5).wait(lambda: self.assertEqual(
             self.get_error_element().text,
             "You've already got this in your list"
         ))

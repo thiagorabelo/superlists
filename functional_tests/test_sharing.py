@@ -31,6 +31,7 @@ class SharingTest(FunctionalTest):
         # Marta acessa a página inicial e começa uma lista
         self.browser = marta_browser
         marta_item_1 = 'Get Help'
+        self.browser.get(self.live_server_url)
         list_page = ListPage(self).add_list_item(marta_item_1)
 
         # Ela percebe que há uma opção "Share this list"
@@ -59,10 +60,10 @@ class SharingTest(FunctionalTest):
         ))
 
         # Ele adiciona um item na lista
-        marta_item_2 = 'Hi Marta'
-        list_page.add_list_item('Hi Marta!')
+        marta_item_2 = 'Hi Marta!'
+        list_page.add_list_item(marta_item_2)
 
-        # Quando Marta atualzia a página, ela vê o acrescimo feito por Jonas
+        # Quando Marta atualiza a página, ela vê o acrescimo feito por Jonas
         self.browser = marta_browser
         self.browser.refresh()
         list_page.wait_for_row_in_list_table(marta_item_2, 2)

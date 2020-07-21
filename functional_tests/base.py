@@ -133,7 +133,7 @@ class FunctionalTest(OnTestFailureTakeScreenshotAndDumpHTMLMixin,  # pylint: dis
         gráfica) caso a variável de ambiente `USER_HEADLESS_BROWSER` seja
         definida. Do contrário, um navegador com interface gráfica será retornado.
         """
-        if os.environ.get('USER_HEADLESS_BROWSER', None):
+        if os.environ.get('HEADLESS_BROWSER', None):
             options = Options()
             options.add_argument('--headless')
             return webdriver.Firefox(options=options)

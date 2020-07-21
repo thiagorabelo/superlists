@@ -5,3 +5,16 @@
 .messages .glyphicon {
     vertical-align: text-top;
 }
+
+
+.shared-by {
+    font-style: italic;
+}
+
+.list-sharee {
+    font-style: italic;
+}
+
+#id_list_owner {
+    font-style: italic;
+}

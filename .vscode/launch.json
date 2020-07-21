@@ -8,8 +8,11 @@
             "name": "Debug Test",
             "type": "python",
             "request": "test",
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            },
             "console": "internalConsole",
-            "justMyCode": false
+            "justMyCode": false,
         },
         {
             "name": "Python: Terminal (integrated)",
@@ -42,24 +45,24 @@
             "stopOnEntry": false,
             "justMyCode": false
         },
-        {
-            "name": "Python: Test (Django)",
-            "type": "python",
-            "request": "launch",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONUNBUFFERED": "1"
-            },
-            "envFile": "${workspaceFolder}/.env",
-            "program": "${workspaceFolder}/manage.py",
-            "args": [
-                "test",
-                "${input:manage_args}"
-            ],
-            "django": true,
-            "stopOnEntry": false,
-            "justMyCode": false
-        },
+        // {
+        //     "name": "Python: Test (Django)",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "console": "integratedTerminal",
+        //     "env": {
+        //         "PYTHONUNBUFFERED": "1"
+        //     },
+        //     "envFile": "${workspaceFolder}/.env",
+        //     "program": "${workspaceFolder}/manage.py",
+        //     "args": [
+        //         "test",
+        //         "${input:manage_args}"
+        //     ],
+        //     "django": true,
+        //     "stopOnEntry": false,
+        //     "justMyCode": false
+        // },
     ],
     "inputs": [
         {
