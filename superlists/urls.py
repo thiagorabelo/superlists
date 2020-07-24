@@ -24,7 +24,9 @@ app_name = 'superlists'
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^$', lists_views.home_page, name='home'),
+    # url(r'^$', lists_views.home_page, name='home'),
+    url(r'^$', lists_views.HomePageView.as_view(), name='home'),
+
     url(r'^lists/', include('lists.urls', namespace='lists')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
 ]

@@ -4,6 +4,8 @@
 
     "python.languageServer": "Pylance",
     "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
     "python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}/.venv/lib/python3.6/site-packages"

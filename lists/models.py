@@ -15,9 +15,13 @@ class List(models.Model):
         return reverse('lists:view_list', kwargs={'list_id': self.pk})
 
     @classmethod
-    def create_new(cls, first_item_text, owner=None):
+    def create_new(cls, first_item, owner=None):
         list_ = cls.objects.create(owner=owner)
-        Item.objects.create(text=first_item_text, list=list_)
+        if isinstance(first_item, cls):
+            first_item.list = list_
+            first_item.save()
+        else:
+            Item.objects.create(text=first_item, list=list_)
         return list_
 
 

@@ -1,19 +1,18 @@
 # pylint: disable=missing-docstring
 
-from unittest import skip
 from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
-from django.http import HttpRequest
 from django.utils.html import escape
 from django.test import TestCase
+from django.test.client import RequestFactory
 
 from lists.models import Item, List
 from lists.forms import (
     DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR,
-    ExistingListItemForm, ItemForm, NewListForm
+    ExistingListItemForm, ItemForm
 )
-from lists.views import new_list
+from lists.views import NewListView
 
 
 User = get_user_model()
@@ -180,21 +179,26 @@ class NewListIntegratedTest(TestCase):
         self.assertEqual(list_.owner, user)
 
 
-@patch('lists.views.NewListForm')
+@patch('lists.views.NewListView.form_class')
 class NewListViewUnitTest(TestCase):
     def setUp(self):
-        self.request = HttpRequest()
-        self.request.POST['text'] = 'new list item'
+        self.request = RequestFactory().post('/lists/new', data={'text': 'new list item'})
         self.request.user = Mock()
 
     def test_passes_POST_data_to_NewListForm(self, mockNewListForm):
-        new_list(self.request)
-        mockNewListForm.assert_called_once_with(data=self.request.POST)
+        NewListView.as_view()(self.request)
+        mockNewListForm.assert_called_once_with(
+            data=self.request.POST,
+            initial={},
+            prefix=None,
+            files=self.request.FILES,
+            instance=None
+        )
 
     def test_saves_form_with_owner_if_form_valid(self, mockNewListForm):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = True
-        new_list(self.request)
+        NewListView.as_view()(self.request)
         mock_form.save.assert_called_once_with(owner=self.request.user)
 
     @patch('lists.views.redirect')
@@ -202,29 +206,30 @@ class NewListViewUnitTest(TestCase):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = True
 
-        response = new_list(self.request)
+        response = NewListView.as_view()(self.request)
 
         self.assertEqual(response,  mock_redirect.return_value)
-        mock_redirect.assert_called_once_with(mock_form.save.return_value)
+        mock_redirect.assert_called_once_with(mock_form.save.return_value.get_absolute_url())
 
-    @patch('lists.views.render')
+    @patch('lists.views.NewListView.response_class')
     def test_renders_home_template_with_form_if_form_is_invalid(
-        self, mock_render, mockNewListForm
+        self, mock_response_class, mockNewListForm
     ):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = False
 
-        response = new_list(self.request)
+        response = NewListView.as_view()(self.request)
+        response_args, response_kwargs = mock_response_class.call_args
 
-        self.assertEqual(response, mock_render.return_value)
-        mock_render.assert_called_once_with(
-            self.request, 'lists/home.html', {'form': mock_form}
-        )
+        self.assertEqual(response, mock_response_class.return_value)
+        self.assertEqual(self.request, response_kwargs['request'])
+        self.assertEqual(['lists/home.html'], response_kwargs['template'])
+        self.assertEqual(mock_form, response_kwargs['context']['form'])
 
     def test_does_not_save_if_form_invalid(self, mockNewListForm):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = False
-        new_list(self.request)
+        NewListView.as_view()(self.request)
         self.assertFalse(mock_form.save.called)
 
 

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
+from django.views.generic import FormView, CreateView
 
 from .models import List
 from .forms import ItemForm, ExistingListItemForm, NewListForm
@@ -8,16 +9,18 @@ from .forms import ItemForm, ExistingListItemForm, NewListForm
 User = get_user_model()
 
 
-def home_page(request):
-    return render(request, 'lists/home.html', {'form': ItemForm()})
+class HomePageView(FormView):
+    template_name = 'lists/home.html'
+    form_class = ItemForm
 
 
-def new_list(request):
-    form = NewListForm(data=request.POST)
-    if form.is_valid():
-        list_ = form.save(owner=request.user)
-        return redirect(list_)
-    return render(request, 'lists/home.html', {'form': form})
+class NewListView(CreateView):
+    template_name = 'lists/home.html'
+    form_class = NewListForm
+
+    def form_valid(self, form):
+        self.object = form.save(owner=self.request.user)
+        return redirect(self.get_success_url())
 
 
 def view_list(request, list_id):

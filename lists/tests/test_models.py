@@ -1,4 +1,4 @@
-from lists.views import new_list
+from lists.views import NewListView
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -109,7 +109,7 @@ class ListModelTest(TestCase):
 
     def test_create_new_creates_list_and_first_item(self):
         item_text = 'new item text'
-        List.create_new(first_item_text=item_text)
+        List.create_new(first_item=item_text)
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, item_text)
         new_list = List.objects.first()
@@ -117,13 +117,13 @@ class ListModelTest(TestCase):
 
     def test_create_new_optionally_saves_owner(self):
         user = User.objects.create()
-        List.create_new(first_item_text='new item text', owner=user)
+        List.create_new(first_item='new item text', owner=user)
         new_list = List.objects.first()
         self.assertEqual(new_list.owner, user)
 
     def test_create_new_returns_new_list_object(self):
         item_text = 'new item text'
-        returned = List.create_new(first_item_text=item_text)
+        returned = List.create_new(first_item=item_text)
         new_list = List.objects.first()
         self.assertEqual(returned, new_list)
 

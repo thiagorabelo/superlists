@@ -25,11 +25,16 @@ class ItemForm(forms.ModelForm):
 
 class NewListForm(ItemForm):
 
-    def save(self, owner):
-        if owner.is_authenticated:
-            return List.create_new(first_item_text=self.cleaned_data['text'], owner=owner)
-        else:
-            return List.create_new(first_item_text=self.cleaned_data['text'])
+    def save(self, owner=None):
+        item = super().save(commit=False)
+        user = owner if owner and owner.is_authenticated else None
+
+        try:
+            list_ = List.create_new(item, owner=user)
+        finally:
+            self.save_m2m()
+
+        return list_
 
 
 class ExistingListItemForm(ItemForm):

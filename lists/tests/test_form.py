@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from lists.forms import (
     DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR,
-    ExistingListItemForm, ItemForm, NewListForm
+    ExistingListItemForm, ItemForm, NewListForm,
 )
 from lists.models import List, Item
 
@@ -58,42 +58,62 @@ class ExistingListItemFormTest(TestCase):
 
 class NewListFormTest(TestCase):
 
+    @patch('django.forms.models.BaseModelForm.save')
     @patch('lists.forms.List.create_new')
     def test_save_creates_new_list_from_post_data_if_user_not_authenticated(
-        self, mockList_create_new
+        self, create_new_list_for_item, mockBaseModelForm_save
     ):
         item_text = 'new item text'
-        user = Mock(is_authenticated=False)
+        owner = Mock(is_authenticated=False)
         form = NewListForm(data={'text': item_text})
+        form.save_m2m = Mock()
 
         form.is_valid()
-        form.save(owner=user)
+        form.save(owner=owner)
 
-        mockList_create_new.assert_called_once_with(
-            first_item_text=item_text
+        create_new_list_for_item.assert_called_once_with(
+            mockBaseModelForm_save.return_value,
+            owner=None
         )
 
+    @patch('django.forms.models.BaseModelForm.save')
     @patch('lists.forms.List.create_new')
     def test_save_creates_new_list_with_owner_if_user_authenticated(
-        self, mockList_create_new
+        self, create_new_list_for_item, mockBaseModelForm_save
     ):
         item_text = 'new item text'
-        user = Mock(is_authenticated=True)
+        owner = Mock(is_authenticated=True)
         form = NewListForm(data={'text': item_text})
+        form.save_m2m = Mock()
 
         form.is_valid()
-        form.save(owner=user)
+        form.save(owner=owner)
 
-        mockList_create_new.assert_called_once_with(
-            first_item_text=item_text,
-            owner=user,
+        create_new_list_for_item.assert_called_once_with(
+            mockBaseModelForm_save.return_value,
+            owner=owner
         )
 
+
+    @patch('django.forms.models.BaseModelForm.save')
     @patch('lists.forms.List.create_new')
-    def test_save_returns_new_list_object(self, mockList_create_new):
+    def test_save_returns_new_list_object(
+        self, mock_create_new_list_for_item, mockBaseModelForm_save
+    ):
         item_text = 'new item text'
-        user = Mock(is_authenticated=True)
         form = NewListForm(data={'text': item_text})
+        form.save_m2m = Mock()
+        owner = Mock(is_authenticated=True)
+
         form.is_valid()
-        returned = form.save(owner=user)
-        self.assertEqual(returned, mockList_create_new.return_value)
+        list_ = form.save(owner=owner)
+
+        mock_create_new_list_for_item.assert_called_once_with(
+            mockBaseModelForm_save.return_value,
+            owner=owner
+        )
+
+        self.assertEqual(
+            mock_create_new_list_for_item.return_value,
+            list_
+        )
