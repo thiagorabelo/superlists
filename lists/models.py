@@ -12,7 +12,7 @@ class List(models.Model):
         return self.item_set.first().text
 
     def get_absolute_url(self):
-        return reverse('lists:view_list', kwargs={'list_id': self.pk})
+        return reverse('lists:view_list', kwargs={'pk': self.pk})
 
     @classmethod
     def create_new(cls, first_item, owner=None):
@@ -35,3 +35,6 @@ class Item(models.Model):
 
     def __str__(self):
         return self.text
+
+    def get_absolute_url(self):
+        return self.list.get_absolute_url()
