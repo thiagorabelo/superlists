@@ -7,7 +7,7 @@ bpython==0.19
 certifi==2020.4.5.1
 cffi==1.14.0
 chardet==3.0.4
-cryptography==3.2
+cryptography==3.3.2
 curtsies==0.3.1
 decorator==4.4.2
 Django==1.11.29
