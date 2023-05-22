@@ -42,7 +42,7 @@ pyparsing==2.4.7
 pytest==5.4.2
 pytest-django==3.9.0
 pytz==2019.3
-requests==2.23.0
+requests==2.31.0
 selenium==3.141.0
 six==1.14.0
 tblib==1.6.0
