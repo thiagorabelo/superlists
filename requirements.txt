@@ -33,7 +33,7 @@ prompt-toolkit==3.0.5
 ptyprocess==0.6.0
 py==1.10.0
 pycparser==2.20
-Pygments==2.7.4
+Pygments==2.15.0
 pylint==2.4.4
 pylint-django==2.0.15
 pylint-plugin-utils==0.6
