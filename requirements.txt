@@ -7,7 +7,7 @@ bpython==0.19
 certifi==2023.7.22
 cffi==1.14.0
 chardet==3.0.4
-cryptography==42.0.2
+cryptography==42.0.4
 curtsies==0.3.1
 decorator==4.4.2
 Django==3.2.24
