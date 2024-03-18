@@ -10,7 +10,7 @@ chardet==3.0.4
 cryptography==42.0.4
 curtsies==0.3.1
 decorator==4.4.2
-Django==3.2.24
+Django==3.2.25
 Fabric3==1.14.post1
 greenlet==0.4.15
 gunicorn==20.0.4
